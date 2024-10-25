@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title>Search Results for <%= user.username %></title>
+    <style>
+    
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .post-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%; /* Full width for responsive design */
+            max-width: 500px; /* Set a max width for the container */
+            justify-items: center;
+            margin-left: 500px;
+            
+        }
+        .post {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+            width: 100%; /* Full width of the container */
+        }
+        .post:hover {
+            transform: translateY(-2px);
+        }
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            background-color: #007BFF; /* Placeholder for avatar */
+        }
+        .post-author {
+            font-weight: bold;
+            color: #007BFF;
+        }
+        .post-content {
+            margin: 10px 0;
+            color: #444;
+        }
+        .post img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        .timestamp {
+            font-size: 0.8em;
+            color: #999;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <% console.log("Including dashboard..."); %>
+    <%- include("dashboard.ejs", { user: user }) %>
+    <h1>Posts by <%= user.username %></h1>
+    
+    <div class="post-container">
+        <% if (posts.length > 0) { %>
+            <% posts.forEach(post => { %>
+                <div class="post">
+                    <div class="post-header">
+                        <div class="post-avatar"></div> <!-- Placeholder for avatar -->
+                        <span class="post-author"><%= post.author1 || 'Unknown' %></span>
+                    </div>
+                    <h3><%= post.title || 'Untitled' %></h3>
+                    <p class="post-content"><%= post.content %></p>
+                    <% if (post.attachment) { %>
+                        <img src="/uploads/<%= post.attachment %>" alt="Post Image" />
+                    <% } %>
+                    <p class="timestamp"><small>Posted on: <%= post.timestamp %></small></p>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <p>No posts found for this user.</p>
+        <% } %>
+    </div>
+</body>
+</html>

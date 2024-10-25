@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="/css/style.css"> <!-- Ensure correct path -->
+</head>
+<body id="body">
+    <div class="container">
+        <h1>Web Blog Login</h1>
+
+        <!-- Show error message if it exists -->
+        <% if (errorMessage) { %>
+            <div class="error-message" style="color: red;">
+                <%= errorMessage %>
+            </div>
+        <% } %>
+
+        <form action="/login" method="POST">
+            <div>
+                <label for="emailOrPhone">Email or Phone:</label>
+                <input type="text" id="emailOrPhone" name="emailOrPhone" required>
+            </div>
+            <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div>
+                <button class="button" id="button" type="submit">Login</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

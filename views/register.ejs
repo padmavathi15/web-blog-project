@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .error-message {
+            color: red;
+            font-size: 14px;
+        }
+     
+    </style>
+</head>
+<body id="body">
+    <div class="container">
+        <h1>Web Blog Register</h1>
+
+        <!-- Show error message if it exists -->
+        <% if (errorMessage) { %>
+            <div class="error-message" style="color: red;">
+                <%= errorMessage %>
+            </div>
+        <% } %>
+ <!-- Show success message if it exists -->
+ <% if (successMessage) { %>
+    <div class="success-message" style="color: green;">
+        <%= successMessage %>
+    </div>
+<% } %>
+
+        <form id="registerForm" action="/register" method="POST">
+            <div>
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required oninput="checkUsername()">
+                <span class="error-message" id="username-error"></span> 
+            </div>
+            <div>
+                <label for="email">Email id:</label>
+                <input type="email" id="email" name="email" required>
+                <span class="error-message" id="email-error"></span>
+            </div>
+            <div>
+                <label for="countryCode">Country Code:</label>
+                <input type="text" id="countryCode" name="countryCode" required pattern="^\+\d{1,3}$" title="Enter valid country code (e.g., +1, +91).">
+            </div>
+            <div>
+                <label for="phone">Phone no.:</label>
+                <input type="tel" id="phone" name="phone" required pattern="^\d{10}$" title="Please enter a valid 10-digit phone number.">
+                <span class="error-message" id="phone-error"></span>
+
+            </div>
+            <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+                <span class="error-message" id="password-error"></span>
+            </div>
+            <div>
+                <label for="cpassword">Confirm Password:</label>
+                <input type="password" id="cpassword" name="cpassword" required>
+                <span class="error-message" id="cpassword-error"></span>
+            </div>
+            <div>
+                <label for="gender">Gender:</label>
+                <select id="gender" name="gender" required>
+                    <option value="">Select Gender</option> <!-- Placeholder option -->
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div>
+                <label for="dob">Date of Birth:</label>
+                <input type="date" id="dob" name="dob" required>
+            </div>
+            <div>
+                <label for="city">City:</label>
+                <input type="text" id="city" name="city" required>
+            </div>
+            <div>
+                <label for="country">Country:</label>
+                <input type="text" id="country" name="country" required>
+            </div>
+            <div>
+                <label for="state">State:</label>
+                <input type="text" id="state" name="state" required>
+            </div>
+            <div>
+                <button class="button" type="submit">Register</button>
+                <p>Already have an account? <a href="/login">Login here</a></p>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function validatePhone() {
+            const phone = document.getElementById('phone').value;
+            const phoneError = document.getElementById('phone-error');
+            const phonePattern = /^\d{10}$/;
+
+            if (!phonePattern.test(phone)) {
+                phoneError.textContent = 'Please enter a valid 10-digit phone number.';
+            } else {
+                phoneError.textContent = '';
+            }
+        }
+
+        // Attach input event listeners for real-time validation
+        document.getElementById('phone').addEventListener('input', validatePhone);
+
+        // Prevent form submission if there are validation errors
+        document.getElementById('registerForm').addEventListener('submit', function(event) {
+            validatePhone();
+
+            const phoneError = document.getElementById('phone-error').textContent;
+
+            if (phoneError) {
+                event.preventDefault(); // Prevent submission if there are errors
+            }
+        });
+        function validateEmail() {
+            const email = document.getElementById('email').value;
+            const emailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+            const emailError = document.getElementById('email-error');
+            if (!emailPattern.test(email)) {
+                emailError.textContent = 'Please enter a valid Gmail address.';
+            } else {
+                emailError.textContent = '';
+            }
+        }
+
+        function validatePassword() {
+            const password = document.getElementById('password').value;
+            const passwordError = document.getElementById('password-error');
+            if (password.length < 6) {
+                passwordError.textContent = 'Password must be at least 6 characters long.';
+            } else {
+                passwordError.textContent = '';
+            }
+        }
+
+        function validateConfirmPassword() {
+            const password = document.getElementById('password').value;
+            const cpassword = document.getElementById('cpassword').value;
+            const cpasswordError = document.getElementById('cpassword-error');
+            if (password !== cpassword) {
+                cpasswordError.textContent = 'Passwords do not match.';
+            } else {
+                cpasswordError.textContent = '';
+            }
+        }
+
+        // Attach input event listeners for real-time validation
+        document.getElementById('email').addEventListener('input', validateEmail);
+        document.getElementById('password').addEventListener('input', validatePassword);
+        document.getElementById('cpassword').addEventListener('input', validateConfirmPassword);
+
+        // Prevent form submission if there are validation errors
+        document.getElementById('registerForm').addEventListener('submit', function(event) {
+            validateEmail();
+            validatePassword();
+            validateConfirmPassword();
+
+            const emailError = document.getElementById('email-error').textContent;
+            const passwordError = document.getElementById('password-error').textContent;
+            const cpasswordError = document.getElementById('cpassword-error').textContent;
+
+            if (emailError || passwordError || cpasswordError) {
+                event.preventDefault(); // Prevent submission if there are errors
+            }
+        });
+
+
+        function checkUsername() {
+        const username = document.getElementById('username').value;
+        const usernameError = document.getElementById('username-error');
+
+        if (username.length === 0) {
+            usernameError.textContent = '';
+            return;
+        }
+
+       fetch(`http://localhost:3001/check-username?username=${username}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.available) {
+            usernameError.textContent = 'Username is available.';
+            usernameError.style.color = 'green';
+        } else {
+            usernameError.textContent = 'Username is already taken.';
+            usernameError.style.color = 'red';
+        }
+    })
+    .catch(error => {
+        console.error('Error checking username:', error);
+        usernameError.textContent = 'Could not check username availability.';
+    });
+
+    }
+
+    </script>
+</body>
+</html>

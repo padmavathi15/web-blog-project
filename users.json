@@ -1,0 +1,26 @@
+[
+  {
+    "username": "padmavathi",
+    "email": "padma@gmail.com",
+    "phone": "5656576768",
+    "password": "padmaa",
+    "gender": "Female",
+    "dob": "2024-10-11",
+    "city": "BENGALURU RURAL",
+    "country": "India",
+    "state": "Karnataka",
+    "countryCode": "+91"
+  },
+  {
+    "username": "padma",
+    "email": "padmaa@gmail.com",
+    "phone": "7655323298",
+    "password": "padmaa",
+    "gender": "Female",
+    "dob": "2024-10-11",
+    "city": "BENGALURU RURAL",
+    "country": "India",
+    "state": "Karnataka",
+    "countryCode": "+91"
+  }
+]

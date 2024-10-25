@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles/style.css">
+    <title>Profile</title>  
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        padding: 20px;
+        text-align: center;
+    }
+    .options-dropdown {
+    display: none; /* Start hidden */
+    /* Other styles */
+}
+    h1, h2 {
+        color: #333;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 500px;
+        margin: 0 auto;
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    label, input, textarea {
+        margin-bottom: 15px;
+        text-align: left;
+    }
+
+    input, textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+
+    button {
+        padding: 10px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #218838;
+    }
+
+    .posts-container {
+        margin-top: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        width: 100%;
+        max-width: 600px;
+        margin: 30px auto 0 auto;
+    }
+
+    .post {
+        background-color: white;
+        padding: 15px;
+        width: 100%;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        text-align: left;
+        position: relative;
+    }
+
+    .post h3 {
+        margin-top: 0;
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    .post-content {
+        padding: 10px;
+        border: 1px solid #eee;
+        background-color: #fff;
+        overflow: auto;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+        margin-top: 10px;
+    }
+
+    .post-content p {
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    .ellipsis-button {
+        cursor: pointer;
+        font-size: 20px;
+        color: #007bff;
+        position: absolute;
+        right: 15px;
+        top: 15px;
+    }
+
+    .options-dropdown {
+        display: none;
+        position: absolute;
+        top: 40px;
+        right: 15px;
+        background-color: white;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        z-index: 1;
+        margin-top: 5px;
+        border-radius: 4px;
+        width: 150px;
+        padding: 10px;
+    }
+
+    .options-dropdown a {
+        display: block;
+        padding: 10px;
+        font-size: 16px;
+        color: #007bff;
+        text-decoration: none;
+        margin: 5px 0;
+    }
+
+    .options-dropdown a:hover {
+        background-color: #f1f1f1;
+    }
+
+    .edit-form {
+        display: none;
+        margin-top: 10px;
+    }
+
+    #preview-img {
+        display: none;
+        width: 150px;
+        height: 150px;
+        margin: 10px auto;
+        object-fit: cover;
+    }
+</style>
+<body>
+    <%- include("dashboard.ejs") %>
+
+    <div class="container">
+        <h1>Your Profile</h1>
+        <img id="profile-img" src="<%= user.profilePic || '/path/to/default/pic.jpg' %>" alt="Profile Picture" style="width: 150px; height: 150px;">
+        
+        <form id="uploadProfilePicForm" enctype="multipart/form-data">
+            <input type="file" name="profilePic" id="profilePicInput" required onchange="previewImage(event)">
+            <img id="preview-img1" alt="Image Preview" onchange="previewImage(event)"> <!-- This image will show the preview -->
+            <button type="button" onclick="uploadProfilePic()">Upload Profile Picture</button>
+        </form>
+
+        <p>Username: <%= user.username %></p>
+        <p>Email: <%= user.email %></p>
+        <p>Phone: <%= user.phone %></p>
+        <p>Gender: <%= user.gender %></p>
+        <p>Date of Birth: <%= user.dob %></p>
+
+        <h2 style="text-align: center;">Add a New Post</h2>
+        <form action="/add-post1" method="POST" enctype="multipart/form-data">
+            <label for="title">Title:</label>
+            <input type="text" name="title" id="title" required>
+
+            <label for="content">Content:</label>
+            <textarea name="content" id="content" rows="5" required></textarea>
+
+            <label for="attachment">Attach Image/File:</label>
+            <input type="file" name="attachment" id="attachment" accept="image/*,.pdf,.doc,.docx,.txt" onchange="previewFile(event)">
+           <button type="submit">Submit Post</button>
+        </form>
+<br/>
+<br/>
+        <h2 style="text-align: center;">Your Posts</h2>
+        <div class="posts-container">
+            <% if (posts.length === 0) { %>
+                <p>No posts yet. Start by adding a new post!</p>
+            <% } else { %>
+                <% posts.forEach(post => { %>
+                    <div class="post">
+                        <h3 style="font-size: 20px;">Posted by <strong><%= post.author1 %></strong> on <%= post.timestamp %></h3>
+                        <h2><span id="post-title-<%= post.id %>"><%= post.title %></span></h2>
+                        <div class="post-content">
+                            <p id="post-content-text-<%= post.id %>"><%= post.content %></p>
+                        </div>
+                        <span class="ellipsis-button" onclick="toggleDropdown(event)">...</span> <!-- Ellipsis button for options -->
+                        <div class="options-dropdown">
+                            <a href="#" class="edit-button" data-id="<%= post.id %>" onclick="toggleEditForm('<%= post.id %>'); event.preventDefault();">Edit</a>
+                            <a href="#" class="delete-button" data-id="<%= post.id %>" onclick="deletePost('<%= post.id %>', event)">Delete</a>
+                            <a href="#" onclick="sharePost('<%= post.id %>', '<%= post.title %>', '<%= post.content %>')">Share</a>
+                        </div>
+                        
+
+                        <!-- Edit Form -->
+                        <div class="edit-form" id="edit-form-<%= post.id %>">
+                            <label for="edit-title-<%= post.id %>">Edit Title:</label>
+                            <input type="text" id="edit-title-<%= post.id %>" value="<%= post.title %>">
+                            <label for="edit-content-<%= post.id %>">Edit Content:</label>
+                            <textarea id="edit-content-<%= post.id %>" rows="3"><%= post.content %></textarea>
+                            <button onclick="savePost('<%= post.id %>', this)">Save</button>
+                            <button onclick="cancelEdit('<%= post.id %>')">Cancel</button>
+                        </div>
+
+                        <!-- Optional: Display attachments if any -->
+                        <% if (post.attachment) { %>
+                            <div class="post-attachment">
+                                <% if (post.attachment.endsWith('.jpg') || post.attachment.endsWith('.png')) { %>
+                                    <img src="/uploads/<%= post.attachment %>" alt="Image">
+                                <% } else if (post.attachment.endsWith('.mp4')) { %>
+                                    <video controls>
+                                        <source src="/uploads/<%= post.attachment %>" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                <% } else { %>
+                                    <a href="/uploads/<%= post.attachment %>">Download Attachment</a>
+                                <% } %>
+                            </div>
+                        <% } %>
+                    </div>
+                <% }); %>
+            <% } %>
+                </div>
+                <br/>
+                <br/><h2 style="text-align: center;">Your Shared Posts</h2>
+                <div class="posts-container">
+                    <% if (sharedPosts.length === 0) { %>
+                        <p>No shared posts yet.</p>
+                    <% } else { %>
+                        <% sharedPosts.forEach(sharedPost => { %>
+                            <div class="post">
+                                <p>Shared from <strong><%= sharedPost.originalAuthor1 %></strong> on <%= new Date(sharedPost.timestamp).toLocaleString() %></p>
+                                
+                                <h3 style="font-size: 20px;"><%= sharedPost.originalTitle %> 
+                                <p style="font-size: 15;font-weight: lighter;"><%= sharedPost.originalContent %></p>
+                
+                                <% if (sharedPost.originalAttachment) { %>
+                                    <div class="post-attachment">
+                                        <% if (sharedPost.originalAttachment.endsWith('.jpg') || sharedPost.originalAttachment.endsWith('.png')) { %>
+                                            <img src="/uploads/<%= sharedPost.originalAttachment %>" alt="Image Attachment">
+                                        <% } else if (sharedPost.originalAttachment.endsWith('.mp4')) { %>
+                                            <video controls>
+                                                <source src="/uploads/<%= sharedPost.originalAttachment %>" type="video/mp4">
+                                                Your browser does not support the video tag.
+                                            </video>
+                                        <% } else { %>
+                                            <a href="/uploads/<%= sharedPost.originalAttachment %>">Download Attachment</a>
+                                        <% } %>
+                                    </div>
+                                <% } %>
+                
+                                <% if (sharedPost.originalAttachment) { %>
+                                    <a href="/uploads/<%= sharedPost.originalAttachment %>" download="<%= sharedPost.originalAttachment %>" style="font-size: 10px;">Download Attachment</a>
+                                    <% } %>
+                                <p><small>Shared by <%= sharedPost.sharedByUser %> on <%= new Date(sharedPost.timestamp).toLocaleString() %></small></p>
+                            </div>
+                        <% }) %>
+                    <% } %>
+                </div>
+
+                
+                
+      
+
+    </div>
+
+    <script>
+        function previewFile(event) {
+        const input = event.target;
+        const file = input.files[0];
+        
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const preview = document.getElementById('attachment');
+                preview.src = e.target.result; // Set the source of the image
+                preview.style.display = 'block'; // Show the preview image
+            };
+
+            reader.readAsDataURL(file); // Read the file as a data URL
+        }
+    }
+        function previewImage(event) {
+            const input = event.target;
+            const file = input.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const preview = document.getElementById('preview-img1');
+                    preview.src = e.target.result;
+                    preview.style.display = 'block'; // Show the preview image
+                };
+
+                reader.readAsDataURL(file);
+            }
+        }
+        function toggleEditForm(postId) {
+    const editForm = document.getElementById(`edit-form-${postId}`);
+    editForm.style.display = editForm.style.display === "none" || editForm.style.display === "" ? "block" : "none";
+}
+        function toggleDropdown(event) {
+    // Prevent the event from bubbling up to document
+    event.stopPropagation();
+
+    const dropdown = event.target.nextElementSibling; // Get the next sibling (dropdown)
+    
+    // Toggle visibility
+    if (dropdown.style.display === "block") {
+        dropdown.style.display = "none";
+    } else {
+        dropdown.style.display = "block";
+    }
+}// Close dropdown when clicking outside
+document.addEventListener("click", function() {
+    const dropdowns = document.querySelectorAll('.options-dropdown');
+    dropdowns.forEach(dropdown => {
+        dropdown.style.display = 'none'; // Hide all dropdowns
+    });
+});
+        // Functions for post editing, deleting, etc.
+        function deletePost(postId, event) {
+            event.preventDefault();
+            // Logic to delete post by postId
+        }
+
+        function sharePost(postId, title, content) {
+    fetch(`/share-post/${postId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ title, content })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload(); // Reload to display shared post
+        } else {
+            alert('Error sharing post: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while sharing the post.');
+    });
+}
+
+
+       
+        function savePost(postId, button) {
+            const title = document.getElementById(`edit-title-${postId}`).value;
+            const content = document.getElementById(`edit-content-${postId}`).value;
+
+            fetch(`/edit-post/${postId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title, content })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById(`post-title-${postId}`).innerText = title;
+                    document.getElementById(`post-content-text-${postId}`).innerText = content;
+                    cancelEdit(postId);
+                } else {
+                    alert('Error saving post: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while saving the post.');
+            });
+        }
+
+        function cancelEdit(postId) {
+            const editForm = document.getElementById(`edit-form-${postId}`);
+            editForm.style.display = 'none';
+        }
+
+        function deletePost(postId, event) {
+            event.preventDefault();
+
+            if (confirm("Are you sure you want to delete this post?")) {
+                fetch(`/delete-post/${postId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error deleting post: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the post.');
+                });
+            }
+        }
+        function uploadProfilePic() {
+    const form = document.getElementById('uploadProfilePicForm');
+    const formData = new FormData(form);
+    
+    fetch('/upload-profile-pic', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const profileImg = document.getElementById('profile-img');
+            profileImg.src = data.profilePicPath; // Update profile image
+            profileImg.alt = 'Profile Picture';
+            document.getElementById('preview-img1').style.display = 'none'; // Hide preview if needed
+
+            // Clear the file input and hide the preview image
+            const profilePicInput = document.getElementById('profilePicInput');
+            profilePicInput.value = ''; // Clear the input
+            const previewImg = document.getElementById('preview-img1');
+            previewImg.src = ''; // Clear the preview image
+        } else {
+            alert('Failed to upload picture: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while uploading the picture.');
+    });
+}
+
+
+    </script>
+    <form action="/logout" method="POST">
+        <button type="submit">Logout</button>
+    </form>
+    
+</body>
+</html>
